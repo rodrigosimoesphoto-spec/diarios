@@ -199,7 +199,7 @@ async function syncToSheet(payload){
 // ============================================================
 // CARREGAR TURMAS E ALUNOS DO SHEETS (atualização dinâmica)
 // ============================================================
-async async function loadTurmasFromSheet(){
+async function loadTurmasFromSheet(){
   if(!SHEET_URL) return;
   try{
     const r=await fetch(SHEET_URL+'?action=getAlunos&t='+Date.now());
