@@ -300,6 +300,7 @@ function populateSelects(){
 populateSelects();
 
 function onMod(){
+  const ms=document.getElementById('mod-sel');
   const m=ms.value,ts=document.getElementById('turma-sel');
   ts.innerHTML='<option value="">Selecione a turma...</option>';
   ['turma-header','diario-area'].forEach(id=>document.getElementById(id).innerHTML='');
