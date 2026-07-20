@@ -199,7 +199,7 @@ async function syncToSheet(payload){
 // ============================================================
 // CARREGAR TURMAS E ALUNOS DO SHEETS (atualização dinâmica)
 // ============================================================
-async function loadTurmasFromSheet(){
+async async function loadTurmasFromSheet(){
   if(!SHEET_URL) return;
   try{
     const r=await fetch(SHEET_URL+'?action=getAlunos&t='+Date.now());
@@ -209,16 +209,23 @@ async function loadTurmasFromSheet(){
     if(data&&data.alunos&&data.alunos.length>0){
       // Convert alunos list into TURMAS structure
       const turmasMap={};
+      // Build a lookup from embedded TURMAS for dias/horario fallback
+      const turmasEmbedded={};
+      TURMAS.forEach(t=>{turmasEmbedded[t.turma]=t;});
       data.alunos.forEach(a=>{
         if(a.status==='Inativo') return;
         const key=a.turma||'SEM_TURMA';
         if(!turmasMap[key]){
+          // Use dias/horario from aluno, fallback to embedded TURMAS, fallback to weekdays
+          const embedded=turmasEmbedded[key]||{};
+          const dias=a.dias&&a.dias.length?a.dias:(embedded.dias&&embedded.dias.length?embedded.dias:[]);
+          const horario=a.horario||embedded.horario||'';
           turmasMap[key]={
-            nome_modalidade: a.modalidade||key,
+            nome_modalidade: a.modalidade||embedded.nome_modalidade||key,
             turma: key,
-            monitor: '',
-            dias: a.dias||[],
-            horario: a.horario||'',
+            monitor: embedded.monitor||'',
+            dias: dias,
+            horario: horario,
             alunos: []
           };
         }
