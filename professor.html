@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Diário de Frequência — Professor | Marista</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Montserrat',sans-serif}
+:root{--azul:#002B7F;--azul-h:#001F5C;--azul-l:#E8EDF8;--azul-m:#4A6BBF;--red:#E31837;--red-l:#FDEAED;--white:#fff;--gray:#F4F5F8;--border:#C8D0E8;--text:#1A1A2E;--muted:#5A6480}
+body{background:var(--gray);padding:10px;min-height:100vh}
+.app{max-width:480px;margin:0 auto}
+select{width:100%;margin-bottom:8px;font-size:13px;font-family:'Montserrat',sans-serif;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);color:var(--text);font-weight:500;outline:none}
+select:focus{border-color:var(--azul)}
+.brand-bar{background:var(--azul);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.brand-logo{width:38px;height:38px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--azul);flex-shrink:0}
+.brand-title{color:white;font-size:14px;font-weight:700;letter-spacing:.3px}
+.brand-sub{color:rgba(255,255,255,.65);font-size:10px;font-weight:500;margin-top:1px;text-transform:uppercase;letter-spacing:.5px}
+.sync-badge{margin-left:auto;background:rgba(255,255,255,.15);color:white;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.4px}
+.turma-header{border:1.5px solid var(--azul);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.th-top{background:var(--azul);padding:12px 14px}
+.th-nome{font-size:14px;font-weight:700;color:white;letter-spacing:.2px}
+.th-meta{font-size:10px;color:rgba(255,255,255,.75);margin-top:3px;font-weight:500;letter-spacing:.3px}
+.th-stats{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--white)}
+.th-stat{text-align:center;padding:8px 0;border-right:1px solid var(--border)}
+.th-stat:last-child{border-right:none}
+.th-stat-n{font-size:18px;font-weight:700;color:var(--text)}
+.th-stat-n.p{color:var(--azul)}
+.th-stat-n.f{color:var(--red)}
+.th-stat-l{font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.diario-wrap{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;background:white}
+.diario-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.diario-table th{background:var(--azul-l);font-size:9px;font-weight:700;color:var(--azul);padding:6px 4px;text-align:center;border-bottom:1.5px solid var(--border);border-right:1px solid var(--border);text-transform:uppercase;letter-spacing:.3px}
+.diario-table th:first-child{text-align:left;padding-left:8px}
+.diario-table th:last-child{border-right:none}
+.diario-table td{border-bottom:1px solid var(--border);border-right:1px solid var(--border);vertical-align:middle;padding:0}
+.diario-table td:last-child{border-right:none}
+.diario-table tr:last-child td{border-bottom:none}
+.nome-cell{padding:7px 8px;font-size:10px;font-weight:500;color:var(--text);line-height:1.3}
+.nome-num{font-size:9px;color:var(--muted);margin-right:3px;font-weight:400}
+.dia-cell{text-align:center;cursor:pointer;height:34px;-webkit-tap-highlight-color:transparent;user-select:none}
+.dia-cell:active{opacity:.7}
+.dia-cell.P{background:#E8EDF8}
+.dia-cell.F{background:var(--red-l)}
+.dia-mark{font-size:11px;font-weight:700}
+.dia-cell.P .dia-mark{color:var(--azul)}
+.dia-cell.F .dia-mark{color:var(--red)}
+.dia-cell.N .dia-mark{color:var(--border)}
+.today-col{background:rgba(0,43,127,.04)!important}
+.dia-cell.P.today-col{background:#D0DAEF!important}
+.dia-cell.F.today-col{background:#FAD4DA!important}
+.legenda{display:flex;gap:14px;padding:7px 12px;background:var(--gray);border-top:1px solid var(--border);font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.leg-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.divider-row td{background:var(--azul-l);font-size:9px;font-weight:700;color:var(--azul);padding:4px 8px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.4px}
+.mes-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mes-nav button{padding:6px 14px;font-size:12px;font-weight:700;font-family:'Montserrat',sans-serif;border:1.5px solid var(--azul);border-radius:8px;background:white;color:var(--azul);cursor:pointer}
+.mes-label{font-size:13px;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:.5px}
+.salvar-btn{width:100%;padding:13px;background:var(--azul);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase}
+.salvar-btn:active{background:var(--azul-h)}
+.toast{background:var(--azul-l);color:var(--azul);border:1.5px solid var(--azul);border-radius:8px;padding:9px 14px;text-align:center;font-size:12px;font-weight:600;margin-bottom:8px;display:none}
+.sem-aula{text-align:center;padding:24px;color:var(--muted);font-size:12px;font-weight:500;background:white;border-radius:10px;border:1.5px solid var(--border)}
+.sync-status{background:white;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0}
+.sync-dot.ok{background:#1D9E75}
+.sync-dot.err{background:var(--red)}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+<div class="brand-bar">
+  <div class="brand-logo">M</div>
+  <div>
+    <div class="brand-title">Diário de Frequência</div>
+    <div class="brand-sub">Colégio Marista · Professor</div>
+  </div>
+  <div class="sync-badge" id="sync-badge">Offline</div>
+</div>
+
+<div class="sync-status" id="sync-status">
+  <div class="sync-dot" id="sync-dot"></div>
+  <span id="sync-text">Verificando sincronização...</span>
+</div>
+
+<select id="mod-sel" onchange="onMod()"><option value="">Selecione a modalidade...</option></select>
+<select id="turma-sel" onchange="onTurma()" style="display:none"><option value="">Selecione a turma...</option></select>
+<div id="mes-nav" style="display:none" class="mes-nav">
+  <button onclick="mudaMes(-1)">&#8592;</button>
+  <span class="mes-label" id="mes-label"></span>
+  <button onclick="mudaMes(1)">&#8594;</button>
+</div>
+<div id="turma-header"></div>
+<div id="diario-area"></div>
+
+<div id="alert-panel" class="alert-panel">
+  <div class="alert-panel-head">
+    <span>⚠</span>
+    <span>Sinalizar ocorrência</span>
+  </div>
+  <div class="alert-panel-body">
+    <div class="alert-btn-row">
+      <button class="alert-btn visitante" onclick="openSignal('visitante')">
+        <span>👤</span> Aluno visitante
+      </button>
+      <button class="alert-btn faltando" onclick="openSignal('faltando')">
+        <span>❓</span> Aluno faltando da lista
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="signal-modal-bg" class="signal-modal-bg" style="display:none" onclick="closeSignal(event)">
+  <div class="signal-modal" id="signal-modal" onclick="event.stopPropagation()"></div>
+</div>
+<div id="toast" class="toast"></div>
+<button id="salvar-btn" class="salvar-btn" style="display:none" onclick="salvar()">Salvar frequência</button>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURAÇÃO — cole aqui a URL do seu Apps Script
+// ============================================================
+const SHEET_URL = "https://script.google.com/macros/s/AKfycby0WKzn71oWj4-nMxhfXGKd_2hNQ8Tl92n0Lzjq-BHQx_LPqUj85siyG5xEgk_um95KLw/exec";
+
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS_NOME={seg:'Segunda',ter:'Terça',qua:'Quarta',qui:'Quinta',sex:'Sexta'};
+
+// Variáveis globais
+const SK='mdiario_v4';
+function loadSt(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):{}}catch(e){return{}}}
+function saveSt(){try{localStorage.setItem(SK,JSON.stringify(ST))}catch(e){}}
+let ST=loadSt();
+let curTurma=null;
+let viewMes=new Date();
+let cellMap={};
+
+let TURMAS=[{"nome_modalidade": "VOLEIBOL", "turma": "VOLEIBOL-3ª6ª", "monitor": "", "dias": ["ter", "sex"], "horario": "19h20", "alunos": ["ALESSA NÓBREGA BELOTTI", "ALICE MOURAO GONTIJO", "ANA CLARA CAMPOS LIMA", "ANA VITÓRIA DIAS DE ANDRADE", "ANA VITÓRIA VILLA VERDE DE CARVALHO ALVES", "ARTHUR DE MORAES JUSTINO", "BARBARA DOS PASSOS FRANCISCHINELLI", "BEATRIZ VALLE REGALEIRA DE PAIVA", "CATARINA LOURENCO FERREIRA", "CAÍQUE VIANA DE SOUSA", "CLARICE GONZAGA ALVES", "DIANA DELMASSO PEREIRA", "ELISA DE FARIAS MARROQUIM", "ELISA GOULART LIMA DE ARAUJO", "ELISA LOPES ZVEITER", "ELOISA NÓRA PIRES", "EMILY GOLDEN EMERICK", "FERNANDA FRANÇA DE SANTANA BOTELHO", "GABRIEL DANTAS FONSECA CARDOSO", "GIOVANNA DANTAS FONSECA CARDOSO", "HELENA SILVEIRA ROCHA ALVES", "ISABELLA RODRIGUES DE OLIVEIRA", "ISADORA MUNIZ CAETANO", "JULIA JURUÁ ADAMENAS", "LARA DE OLIVEIRA RIBEIRO ALELUIA", "LARISSA MENDONÇA ROSSI", "LAURA LEMOS MARIZ", "LIS SANTOS PINHEIRO", "LUISA BARROS CARVALHO", "LUIZA BRESCIANI PEDRO", "LUÍSA MOREIRA BARBOSA", "MALU CABRAL SANCHES", "MANUELA MIRANDA DO AMARAL MONTEIRO LOPES", "MANUELA ROCHA SOARES", "MARIA FERNANDA OLIVEIRA PIMENTA", "MARIA VALENTINA CHAVES BITENCOURT", "MARIANA LOPES GOMES", "MARIANNA MALZAC DOS SANTOS", "MARINA GAIGHER CASEIRO", "MELINA DIAS VILLAR ROMANO", "NATHÁLIA VIECELLI FIGUEIRÊDO BEZERRA DE MENEZES", "NICOLE COELHO BIANCHI", "NICOLE GOLDEN EMERICK", "NINA CARVALHO MELO KOHLRAUSCH E SOUZA", "PIETRA FONSECA DE PAULA", "RAFAELA CAMPOS LIMA", "SOFIA COSTA DE ARAUJO", "SOPHIA GALHARDO DAUDT", "SORAYA ALVES CORREIA", "VALENTINA PÉRES GOMES"]}, {"nome_modalidade": "JUDÔ", "turma": "JUDÔ-3ª5ª", "monitor": "", "dias": ["ter", "qui"], "horario": "17h20", "alunos": ["ALICE ABREU GARCIA", "ARTHUR MARQUES VELASCO E SILVA", "BENJAMIN BATISTA BERTOLUCCI", "BERNARDO CAMPOLINA DRUMMOND", "BRUNO ARAÚJO MOREIRA", "CAIO SALVATE ASSIS", "DANIEL INÁCIO DE BRITO NEIVA", "FRANCISCO CARVALHO DO AMARAL", "HENRIQUE ARAUJO COELHO FERNANDES", "JOAO DANIEL RAMALHO ALVES DE OLIVEIRA", "JOSÉ PEDRO ARAÚJO FERRAZ", "JOÃO PEDRO URSULINO TEIXEIRA", "JOÃO VICTOR MOREIRA COLTRI LUGO", "JÚLIA ALCOFORADO PEREIRA RODRIGUES", "JÚLIA HONÓRIO PRADO", "LUCAS FONSECA NEPOMUCENO", "LUIS FERNANDO CAMPOS", "LUÍSA ARAÚJO EIRADO", "OTTO ARAUJO GUY EIRADO", "VINÍCIUS BATISTA COSTA"]}, {"nome_modalidade": "TEATRO", "turma": "TEATRO-4ª6ª", "monitor": "", "dias": ["qua", "sex"], "horario": "18h30", "alunos": ["ALICE ABREU GARCIA", "ALICE ELLERES GUEDES", "AURORA DE SOUSA OLIVEIRA", "MANUELA NUNES PRADO MAMEDE", "MARIA CLARA DE PIERI COSER", "MARIA LUIZA ROCHA PIERUCCETTI", "MARIAH BANDEIRA CARDOSO", "MELISSA GONÇALVES ALVES", "OLÍVIA ANDRADE DE MORAES E CASTRO ZAMBON", "PIETRA LIPPELT NILSON", "PIETRO GABRIEL NUNES DE OLIVEIRA"]}, {"nome_modalidade": "ESTENDIDO GRUPO 01", "turma": "ESTENDIDO_GRUPO_01", "monitor": "", "dias": ["seg", "ter", "qua", "qui", "sex"], "horario": "manhã", "alunos": ["ALICE ALMEIDA MEDEIROS", "ARTHUR GANIM DE MENEZES", "ARTHUR LOPES MARQUES DE OLIVEIRA", "AUGUSTO HSIE DE RESENDE", "BERNARDO NORITA LEITE", "CATARINA CESAR DOLES", "GABRIELA LEITE DOS REIS", "GIOVANA VIEIRA GARRIDO", "GIOVANNA AMATO DA ROCHA OLIVEIRA", "ISAAC CARVALHO EVANGELISTA SILVA", "ISABELA BEZERRA DE ASSIS", "ISABELLA CORDEIRO ITACARAMBI", "ISADORA SOUZA OLIVEIRA", "JOÃO GILBERTO LOPES RESENDE", "LAIS PLATE CORTELETTI", "LARA OLIVEIRA SARMENTO FALCÃO", "LUCAS QUADRADO DE LINHARES LIMA", "MIGUEL SOUZA OLIVEIRA", "PEDRO FALCHI GAGLIOLI", "RAFAEL PEDRUCO DE CAMPOS MARINÉLLI", "SOFIA DE OLIVEIRA LUNA", "TERESA CÉSAR DOLES"]}, {"nome_modalidade": "GR", "turma": "GR-2ª4ª", "monitor": "", "dias": ["seg", "qua"], "horario": "18h30", "alunos": ["ALICE CARVALHO PANTALEÃO", "ALICIA REIS DEMES LIMA TAVARES", "AMANDA LÔBO MOSCOSO", "ANA LUIZA ALVES QUEIROZ", "BARBARA DOS PASSOS FRANCISCHINELLI", "CATARINA DE CASTRO THEWES", "CLARA FERREIRA JUSTINO", "ELISA ASSIS MENDONÇA", "ELISA RODRIGUES CARVALHO", "GABRIELA FLEURI DE PAULA DOS SANTOS", "HELENA FERREIRA LEITE", "HELENA GONÇALVES DE CARVALHO", "HELENA MOTA MARINHO ALBUQUERQUE LOBO", "ISABELA REIS MARTINS", "JULIA BARROS DA ROCHA", "JULIA FAGUNDES FERNANDES", "LIVIA CAVALCANTE RODRIGUES", "MANOELA BERTHOLDO BRESSAN", "MARIA LUIZA DE DEUS OLIVEIRA", "MARIA LUÍSA DAMASCENO VIANA", "MARIA NOGUEIRA GUIMARÃES DE SOUZA E SILVA", "MARIANA BRAGA ALVARENGA", "MARIANA LEITE NEVES E SILVA", "NATÁLIA MIRANDA DO AMARAL MONTEIRO LOPES", "NINA CARVALHO MELO KOHLRAUSCH E SOUZA", "PIETRA LANDIM BARROSO GOMES", "SOPHIA ALVES MACEDO", "SOPHIA LIMA SEGADAS VIANNA"]}, {"nome_modalidade": "GR", "turma": "GR-3ª5ª", "monitor": "", "dias": ["ter", "qui"], "horario": "12h30", "alunos": ["ALICE DE SOUSA TOLEDO", "ALICE DE SOUZA ROCHA", "ANA CAROLINA LOPES RODRIGUES", "ANA LAURA SANTOS NUNES", "ANA LUISA REVERTE MANFRIN", "ANA LUIZA OLIVEIRA CARVALHO", "ANA MARIA FARIAS SUFFREDINI", "ANA PAULA SILVA NOGUEIRA", "ANNE XIMENES MILFONT", "ANTONELLA QUEIROZ DO NASCIMENTO", "BEATRICE PORTO FEITOZA", "CECÍLIA RIBEIRO FERREIRA BORGES", "ELISA QUEIROZ FERREIRA", "ESTELLA JERÔNIMO DOS SANTOS", "GABRIELA ALVES LOPES CARVALHO DE ASSIS VASCONCELOS", "GIOVANNA GUIMARÃES LEANDRO", "HELENA MARQUES PACHECO", "HELENA MENEZES DE LIMA", "HELENA VIEGAS MORAES CRUZ", "ISADORA BRAGA DE LIMA", "ISADORA MARQUES VIANA", "LAURA LIMA RODRIGUES", "LAURA MAURICIO PASSOS", "LAURA MONIQUE BARACHO BENZI", "MALU CABRAL SANCHES", "MANUELA LACERDA D´AMBROSIO", "MARIA CLARA SANTOS NUNES", "MARIA EDUARDA REVERTE MANFRIN", "MARIA FERNANDA DE DEUS OLIVEIRA", "MARIA GIULIA GUERRA VIEIRA SILVA", "MARIA JÚLIA ALMEIDA LIMA", "MARIA MANZAN MONTEIRO", "MARIAH SCARPELINI DE ALBUQUERQUE", "MARIANA GOMES CAPONE", "MARIANA MAHON OLIVEIRA DE ARAÚJO", "MARIANA TOLENTINO HERCOS", "MARINA ASSENÇO DOS SANTOS DE LIMA PINHO", "NICOLE LANDIM BARROSO GOMES", "RAFAELA FERREIRA GERALDINO BERTOLDI", "RAFAELA HILPERT REGO", "SARA MOTA GONÇALVES", "SARAH RANGEL CORADO", "SOPHIA ARAUJO DE OLIVEIRA", "VALENTINA LONDE BOMFIM"]}, {"nome_modalidade": "INTEGRAL GRUPO 03", "turma": "INTEGRAL_GRUPO_03", "monitor": "", "dias": ["seg", "ter", "qua", "qui", "sex"], "horario": "tarde", "alunos": ["ALICE MALENHA TAFFNER", "DAVI JESUS DE ANDRADE", "DENISE LINHARES DE SOUZA", "ERICKA DRUMOND LEITE GUIMARÃES", "FRANCISCO ALVES JANUZZI", "GABRIEL CÂNDIDO MOREIRA", "HEITOR JESUS DE ANDRADE", "HEITOR LEONAM ORNELAS DA SILVA", "ISAAC GARCÊS RIBEIRO CARRIJO", "ISABELA DA CÂMARA LIMA PALHARES", "LORENA MENEGUCI LEVENHAGEN", "LORENZO TELES LEITE", "MARIA LOUISE RIBEIRO PIOTTO GUIMARÃES", "MARIANA PETEK PEREIRA CARRILHO", "MATHEUS MIRANDA MARTINS", "SERENA LINHARES DE SOUZA", "TÚLIO DOURADO COURA"]}, {"nome_modalidade": "GRUPO MARISTA DE DANÇA", "turma": "GRUPO_MARISTA_DE_DANÇA-2ª4ª", "monitor": "", "dias": ["seg", "qua"], "horario": "13h", "alunos": ["ALICE MAMERI FRANCO", "BEATRIZ NARDI", "CECÍLIA BASSUL EVANGELISTA GONÇALVES", "HELENA GUIMARÃES COSTA", "LAURA BANDEIRA TORRES MARQUES", "MELINA DIAS VILLAR ROMANO"]}, {"nome_modalidade": "ESTENDIDO GRUPO 02", "turma": "ESTENDIDO_GRUPO_02", "monitor": "", "dias": ["seg", "ter", "qua", "qui", "sex"], "horario": "manhã", "alunos": ["ALICE MARIA GUIMARAES BARUFI", "BENICIO TARGINO FORINI", "DANTE PIAZZA FAGUNDES", "EDUARDO CHAVES MARTINS", "ENRICO TEIXEIRA SANT´ANNA", "FELIPE GAYOSO BEZE", "HELOÍSA HSIE DE RESENDE", "ISABELA LIMA BORGARELLI", "JOÃO ANTÔNIO GONÇALVES GUERRA", "LUIZ FELIPE MARTINS PINHEIRO", "MANUELA NUNES CARVALHO", "MIGUEL ARCOVERDE MONTILHA", "MIGUEL ASSIS LARA", "PEDRO HENRIQUE LIMA DE MEDEIROS", "PIETRA ALLEMAND NUNES", "RAFAEL MICHELIN STRINO"]}, {"nome_modalidade": "BALÉ", "turma": "BALÉ-2ª4ª", "monitor": "", "dias": ["seg", "qua"], "horario": "18h30", "alunos": ["ALICE SANTOS ROSADO", "CECÍLIA RAMOS DE OLIVEIRA", "LAVINIA GONÇALVES ALVES", "LAVÍNIA LIMA MATOS", "LIVIA FAUSTO ALBERTON", "LUÍSA ARAÚJO EIRADO", "LUÍSA GONTIJO FREITAS GABRIEL", "MARIA LUÍSA SENA MENDONÇA", "MARIANA MAGALHÃES MELO", "MARINA TEIXEIRA ANDRADE", "MIRELA LIMA MATOS"]}, {"nome_modalidade": "TEATRO", "turma": "TEATRO-3ª5ª", "monitor": "", "dias": ["ter", "qui"], "horario": "17h20", "alunos": ["ALINE YEPES DORIA DE ANDRADE", "ANA CLARA VIDAL COSTA OLIVEIRA", "ANTONIA REBELLO SOARES", "ARTHUR GUEDES SOUZA", "BENJAMIN BRITO NUNES", "BENJAMIN RAMOS BONFIM", "BÁRBARA CARVALHO SOARES SANCHES", "CATARINA LOURENCO FERREIRA", "CATHARINA MARINHO DE BRITO", "CHIARA PORTO FEITOZA", "CLARA MENDES SANTOS", "CLARICE GONZAGA ALVES", "DAVI LIRA DE ALMEIDA", "GABRIEL KOLARIK DE SOUSA", "GABRIELA TEIXEIRA BISCONSIN", "HEITOR SOARES DE SANTANA", "HELENA CARVALHO SOARES SANCHES", "JULIA JURUÁ ADAMENAS", "JÚLIA LEMOS MARIZ", "LAURA ZANOTELLI BASTOS", "LEONARDO EVANGELISTA PEREIRA SILVA", "LIAM KIYOMI RABELO", "LOVISA THERESA CONDE SILVA DE SANTANA", "LUCAS MONTEIRO PORN VIEIRA DE SOUSA", "LUCY VARGAS SILVA", "MANUELA AMARAL PEREIRA", "MARIA GABRIELA KOLARIK DE SOUSA", "MARIANA DA COSTA RAPOSO", "MURILO LONDE BOMFIM", "NATHÁLIA VIECELLI FIGUEIRÊDO BEZERRA DE MENEZES", "NATÁLIA MAGNINO ABREU BORTOLETO", "NICOLE ARAUJO MOREIRA", "NINA CARVALHO MELO KOHLRAUSCH E SOUZA", "NOAH FORTES LISBOA NUNES", "OLÍVIA MEIRELES MARQUES MORAIS", "PEDRO GARCIA ANTUNES", "PEDRO LEAL SANTIAGO", "PIETRA FONSECA DE PAULA", "RAFAEL ARTHUR MEDEIROS PORTUGAL", "THALES SOARES DE SANTANA", "ULISSES MIGUEL LUCHESI FERREIRA", "VINICIUS TEIXEIRA ANDRADE", "VITÓRIA SANCHES DA ROCHA PRADO", "ÍSIS DE MACEDO BARROSO"]}, {"nome_modalidade": "BALÉ", "turma": "BALÉ-3ª5ª", "monitor": "", "dias": ["ter", "qui"], "horario": "18h30", "alunos": ["AMANDA LÔBO MOSCOSO", "ANA VITÓRIA GANIM DE MENEZES", "CAMILA MENDES SANTOS", "CATARINA CAVALCANTE DE PAIVA", "CATARINA PESSOA DE CAMARGO", "CATHERINE BARRETO DUARTE", "CECILIA MENEZES DE LIMA", "ELISA ASSIS MENDONÇA", "ELISA INÁCIO DE BRITO NEIVA", "EVA MEL LIMA SOUZA", "HELENA LANDIM OLIVEIRA", "HELOISA DIAS DE ASSIS", "ISABELA REIS MARTINS", "ISABELLE DE SOUZA ROCHA", "ISADORA FERREIRA JUSTINO", "ISADORA PEREIRA CÂNDIDO", "JULIA GONÇALVES TORQUATO DE SOUZA", "LARA DE OLIVEIRA RIBEIRO ALELUIA", "LAÍS OLIVEIRA MONNERAT", "LIZ DA MOTA SALES", "LIZ FILETE DE MENEZES", "LUÍSA DE MELO MOREIRA", "MANUELA ANTUNES DE SOUZA", "MANUELA NUNES PRADO MAMEDE", "MANUELA PESSOA DE CAMARGO", "MARCELLA DOMINGUES SOARES DE PAULA", "MARIA CLARA MARION MAGALHÃES", "MARIA HELENA LEITE MORAES", "MARIA LUIZA DE DEUS OLIVEIRA", "MARIAH BANDEIRA CARDOSO", "MARIANA LEITE NEVES E SILVA", "MELISSA GONÇALVES ALVES", "RAQUEL RAMALHO ALVES DE OLIVEIRA"]}, {"nome_modalidade": "INTEGRAL GRUPO 02", "turma": "INTEGRAL_GRUPO_02", "monitor": "", "dias": ["seg", "ter", "qua", "qui", "sex"], "horario": "tarde", "alunos": ["ANA DE SOUSA FELIZARDO", "CAROLINE TEIXEIRA SARQUIS", "DAVI BERTOLDO DE MELO", "GABRIEL DE VASCONCELOS TAVARES", "HELENA VILARIM ROSA", "HENRIQUE DE CASTRO VENDRAME", "LINO NASCIMENTO SOUZA TOMAZ", "LUCAS ALVES PIRES", "MURILO SOARES COELHO", "NICOLAS PINHEIRO ARAUJO", "VICENTE MELO SOUTO"]}, {"nome_modalidade": "FUTSAL", "turma": "FUTSAL-2ª4ª", "monitor": "", "dias": ["seg", "qua"], "horario": "18h30", "alunos": ["ANDRE FONSECA NEPOMUCENO", "ANTHONY FAUSTO ALBERTON", "ARTHUR DE MORAES JUSTINO", "AUGUSTO BASTOS PASSOS BATISTA", "AUGUSTO CESAR PEREIRA CERQUEIRA", "BENJAMIN BRITO NUNES", "BENJAMIN CABRAL SANCHES", "BERNARDO PEREIRA GOTTSCH", "BRUNO ARAÚJO MOREIRA", "BRUNO OLIVEIRA MARRA", "CAIO SALVATE ASSIS", "CIRO SOARES MEDRADO", "DANIEL RODRIGUES MARTINS NEVES", "DAVI FRANCISCO MACÊDO FABIANE", "DAVI GONÇALVES ALVES", "DAVI MOTA GONÇALVES", "EMANUEL OLIVEIRA DE LIMA", "GABRIEL CREPALDI SANTANA", "GABRIEL FAGUNDES FERNANDES", "GUSTAVO SABA TEIXEIRA GARCIA LARANJEIRA BARBOZA", "HEITOR DE OLIVEIRA BASTOS", "HEITOR RODRIGUES MARTINS NEVES", "HEITOR SOARES DE SANTANA", "HENRI GOMES BRASIL", "HENRIQUE ARAUJO COELHO FERNANDES", "JOSÉ PEDRO ARAÚJO FERRAZ", "JOÃO PAULO LEITE MORAES", "JOÃO PAULO PEIXOTO LELIS", "JOÃO PEDRO DE SOUSA GRANER", "JOÃO VITOR VIEIRA DA CUNHA FERREIRA", "JOÃO ÂNGELO VIEIRA BUSS", "LEVI SENTO-SÉ DUARTE NASCIMENTO", "LUCAS BARROS DA ROCHA", "LUCAS BERTELLI CAIADO", "LUCAS FONSECA NEPOMUCENO", "LUCCA MAMARE MICHELETTI", "MATEUS MARTINS AFONSO NOGUEIRA", "NATHAN SENTO-SÉ DUARTE NASCIMENTO", "NICOLAS SCARPELINI DE ALBUQUERQUE", "OTTO ARAUJO GUY EIRADO", "PEDRO BARINO PIRES MORENO", "RAFAEL DE ABREU ARAUJO OLIVEIRA", "RAFAEL DUARTE GUEDES", "RAFAEL MOREIRA SERRA", "ULISSES MIGUEL LUCHESI FERREIRA", "URIEL ABDUL HAK DOS SANTOS", "VALENTINA PÉRES GOMES", "VICENTE BERTHOLDO  BRESSAN", "VICTOR ALEXANDRE BRAGA ALVARENGA", "VINÍCIUS BATISTA COSTA"]}, {"nome_modalidade": "JUDÔ", "turma": "JUDÔ-2ª4ª", "monitor": "", "dias": ["seg", "qua"], "horario": "18h30", "alunos": ["ANDRE FONSECA NEPOMUCENO", "ANTHONY LEMONIER MORAIS LIMA", "AUGUSTO NUNES MOYSÉS", "AUGUSTO ROCHA MUSSE", "CLARICE GONZAGA ALVES", "DANIEL LOBO FURTADO SALES", "FELIPE FRANÇA DE SANTANA BOTELHO", "FELIPE PEREIRA GIFFONI BRANT MARES", "FERNANDO NAVARRO MACHADO FERNANDES", "GABRIEL DANTAS FONSECA CARDOSO", "GAEL MARQUES LUSTOSA DOURADO", "GIOVANNA DANTAS FONSECA CARDOSO", "HELENA SILVEIRA ROCHA ALVES", "JAIRO ANTONIO GOMES DA SILVA NETO", "LUCAS MONTEIRO PORN VIEIRA DE SOUSA", "MANUELA LACERDA D´AMBROSIO", "MARCUS MONTEIRO PORN VIEIRA DE SOUSA", "MURILO DE ABREU ARAUJO OLIVEIRA", "NICOLE ARAUJO MOREIRA", "PIETRO COSTA DEL RIO", "THALES SOARES DE SANTANA", "VINICIUS ASSIS MENDONÇA"]}, {"nome_modalidade": "VOLEIBOL TREINAMENTO SUB14", "turma": "VOLEIBOL_TREINAMENTO_SUB14-2ª4ª6ª", "monitor": "", "dias": ["seg", "qua", "sex"], "horario": "16h30", "alunos": ["ANELISE BEATRIZ DIEHL SEIBERT", "ANTONELLA DELLA PENNA DOS SANTOS", "BRUNA RESENDE BARRETO FROTA", "CECÍLIA PRIZON BARBOSA", "ELIS CARDOSO BOMFIM PEREIRA RIBEIRO", "FERNANDA AYUMI JUNQUEIRA SHIGUTI", "GABRIELA NASCIMENTO DAINEZ RESENDE", "ISABEL RHEINGANTZ MONIZ RESENDE", "ISABELA BOGER LOPES", "ISADORA ASSUNÇÃO DE SOUZA", "JÚLIA MARTINS DE SOUSA TAVARES", "LAURA CARNEIRO COIMBRA", "LUÍZA ANJOS DE BRITO", "MAITÊ MUSSI MEIRELES", "MARIA ALICE SANTANA CORREIA", "MARIA EDUARDA DAMASCENO BARBOSA COSTA", "MARIANA DE OLIVEIRA TELES", "SOFIA FERNANDES BRAZUNA"]}, {"nome_modalidade": "FUTSAL", "turma": "FUTSAL-3ª5ª", "monitor": "", "dias": ["ter", "qui"], "horario": "18h30", "alunos": ["ANTHONY LEMONIER MORAIS LIMA", "ARTHUR CINTRA LUCENTE", "AUGUSTO NUNES MOYSÉS", "BRUNO ENRICO AURELIANO BONFIM", "DAVI SOARES ODA", "ENZO BRASIL VIGHINI", "ENZO SANCHES TORQUATO", "FABRICIO MARINARI PERES", "FELIPE PEREIRA GIFFONI BRANT MARES", "GABRIEL SILVEIRA LIMA", "GAEL MARQUES LUSTOSA DOURADO", "GUILHERME ANDRADE LIMA", "HEITOR GOULART LIMA DE ARAUJO", "ICARO SAMUEL DE MACEDO BARROSO", "JACK OBEID", "JOAO GUSTAVO BECKER MATOS", "JOAO PEDRO FARIAS SUFFREDINI", "JOSÉ GABRIEL RODRIGUES NETO", "JOÃO GABRIEL FERNANDES GUIMARÃES CARVALHO", "LORENZO LISBOA", "LORENZO OLIVEIRA MARIANO", "LUCA BRASIL VIGHINI", "LUCAS ALMEIDA DE CARVALHO", "LUCAS PEDRUCO GUIMARAES GUARDIA", "LUCAS RANGEL CORADO", "LUCAS SENA PEDROSA", "LUIS GUILHERME DE CARVALHO RIBEIRO", "MARCUS MONTEIRO PORN VIEIRA DE SOUSA", "MATEUS SILVA BERNARDI", "MATHEUS LACERDA DOS SANTOS", "MIGUEL DE LIMA FRANCO", "MIGUEL FRANZINI COUTO", "MURILO BATISTA PISTER", "MURILO DE ABREU ARAUJO OLIVEIRA", "PEDRO AMARAL GULARTE SANTA CRUZ", "PEDRO CARRARA REHEM", "PIETRO COSTA DEL RIO", "RAFAEL CONDÉ ZUCATTO", "SAMUEL HIROYUKI SIMPLICIO KUDO", "SANTIAGO MIGUEL GONZALES ROSAS", "THALES SOARES DE SANTANA", "TÉO RIBEIRO GALLO", "VINICIUS ASSIS MENDONÇA", "VITÓRIO HENRIQUE PACHECO FERREIRA"]}, {"nome_modalidade": "FUTSAL TREINAMENTO SUB14", "turma": "FUTSAL_TREINAMENTO_SUB14-2ª3ª6ª", "monitor": "", "dias": ["seg", "ter", "sex"], "horario": "16h30", "alunos": ["ANTÔNIO LUIZ DIEHL SEIBERT", "ARTHUR NETO SIMOES", "BENJAMIN HENRIQUE VIEIRA FOLSTA", "BENJAMIN PACHECO MARQUES", "DAVI MORAES PAIVA", "DAVI YOSHIO REZENDE ARAKE MARTINS", "GABRIEL BATISTA SOUSA FROTA", "JOAQUIM PINHEIRO TEIXEIRA SANTANA", "JOÃO GABRIEL DUARTE GUEDES", "JOÃO VITOR DE SENA RODRIGUES", "LUCAS NUNES MORAES", "MARCELO LÔBO MOSCOSO", "MATHEUS LACERDA DOS SANTOS", "MIGUEL NASCIMENTO FERREIRA", "MIGUEL PINHEIRO TEIXEIRA SANTANA", "RODRIGO VALLE REGALEIRA DE PAIVA", "THEO NÓBREGA BELOTTI", "THIAGO BOGER LOPES"]}, {"nome_modalidade": "BASQUETE TREINAMENTO SUB17", "turma": "BASQUETE_TREINAMENTO_SUB17-3ª5ª6ª", "monitor": "", "dias": ["ter", "qui", "sex"], "horario": "16h30", "alunos": ["ARTHUR FONTOURA SILVA DUTRA", "ARTHUR MONTEIRO FERREIRA LIMA ROLIM", "BENICIO DE BERREDO REIS E RUIZ LIMA", "BENJAMIM LEITE VELLOSO", "ENZO DE FARIAS FRANÇA", "GUILHERME PALHARES BARBOSA DE ARAÚJO DUARTE", "JULIANO VIRIATO FERREIRA", "MATEUS ILHA DE ARRUDA", "MAURÍCIO RICARDO DE OLIVEIRA SILVA GOMES", "MIGUEL LUIZEVANE MACHADO", "MIGUEL OLIVEIRA HAN", "OTAVIO AUGUSTO ANTUNES DUARTE"]}, {"nome_modalidade": "FUTSAL TREINAMENTO SUB17", "turma": "FUTSAL_TREINAMENTO_SUB17-3ª5ª", "monitor": "", "dias": ["ter", "qui"], "horario": "19h20", "alunos": ["ARTHUR SILVEIRA LIMA", "BENJAMIN SANTOS ROSADO", "DAVI BALZANI OLIVEIRA", "GABRIEL DE SENA RODRIGUES", "GABRIEL SOUZA AGUIAR", "GUILHERME PONTES LEONARDI", "HENRIQUE BARRETO FARIA", "HENRIQUE COSTA DE FARIA", "LORENZO DE FARIAS MENDES", "LUCAS GUIMARAES ARAUJO DE OLIVEIRA", "MATEUS BERNARDES DE LUCENA", "PEDRO DE ALMEIDA ABREU AMORIM", "PEDRO OLEGÁRIO SPÍNDOLA CAVALCANTE", "SAMUEL SARKIS FERREIRA DA MOTA", "VITOR BARBALHO DE FREITAS CARVALHO", "VITOR GABRIEL SEPULVEDA ARAUJO"]}, {"nome_modalidade": "IINTEGRAL GRUPO 01", "turma": "IINTEGRAL_GRUPO_01", "monitor": "", "dias": ["seg", "ter", "qua", "qui", "sex"], "horario": "tarde", "alunos": ["ARYA VILLA REAL MONTARROYOS", "CAETANO MAIA COUTINHO MACHADO", "HEITOR QUIXABEIRA DE ALMEIDA", "JÚLIA DA CÂMARA LIMA PALHARES", "LAURA DE ANDRADE MILHOMENS", "LINA BRAGA LUCCHESI", "LUCAS DE MORAES BARBOSA", "MAITÊ MARIZ CROESY ANDRADE", "MARIA LUÍSA PONTES MARIZ", "THEO BASSUL EVANGELISTA GONCALVES"]}, {"nome_modalidade": "LUTAS TREINAMENTO", "turma": "LUTAS_TREINAMENTO-3ª5ª", "monitor": "", "dias": ["ter", "qui"], "horario": "12h40", "alunos": ["BEATRIZ DE MORAIS RODRIGUES LEITE", "ESTER CRISTINE DE OLIVEIRA SILVA GOMES", "LARISSA DE PAULA PEREIRA", "MARINA DA SILVA TORRES", "NICOLAS RÊNER ABREU RODRIGUES"]}, {"nome_modalidade": "NATAÇÃO", "turma": "NATAÇÃO-3ª5ª", "monitor": "", "dias": ["ter", "qui"], "horario": "15h30", "alunos": ["BELLA MARQUES DO CARMO", "NATÁLIA MIRANDA DO AMARAL MONTEIRO LOPES"]}, {"nome_modalidade": "INTEGRAL GRUPO 04", "turma": "INTEGRAL_GRUPO_04", "monitor": "", "dias": ["seg", "ter", "qua", "qui", "sex"], "horario": "tarde", "alunos": ["BENJAMIM SIMONETO FERREIRA LIMA ROLIM", "CECILIA CARVALHO DE ANDRADE", "CECILIA MARRA RIBEIRO", "CLARA OLIVEIRA SARMENTO PEREIRA", "DAVI LUCENA ROGERIO", "FELIPE KILL DA ESCOSSIA MARTINS", "GUIDO BRAGA LUCCHESI", "HELENA DE CASTRO VENDRAME", "HELENA TEIXEIRA SARQUIS", "JOAO LUCAS SILVA MARTINS", "JOÃO ANTÔNIO DUARTE MOREIRA", "JOÃO GABRIEL GONÇALVES HOLANDA DE OLIVEIRA", "LAURA ZANOTELLI BASTOS", "LEONARDO ALVES GONÇALVES E SILVA FILHO", "LORENZO VINICIUS GUIMARÃES MOTA", "LOVISA THERESA CONDE SILVA DE SANTANA", "MATHEUS OLIVEIRA ROCHA", "OLIVIA DE MORAES BARBOSA", "RAPHAEL LOPES DUARTE DE SOUSA ARANTES"]}, {"nome_modalidade": "NATAÇÃO", "turma": "NATAÇÃO-2ª4ª", "monitor": "", "dias": ["seg", "qua"], "horario": "12h30", "alunos": ["BRYAN LEVI SILVA MAGNO", "ELISA ASSIS MENDONÇA", "GABRIELA ALVES LOPES CARVALHO DE ASSIS VASCONCELOS", "GUSTAVO SANTOS VAZ", "HEITOR DIAS DE ASSIS", "JAIRO ANTONIO GOMES DA SILVA NETO", "JOAO GUSTAVO BECKER MATOS", "JOÃO TAVARES BACCHINI", "LIZ FILETE DE MENEZES", "MARIAH SCARPELINI DE ALBUQUERQUE", "MATEUS SILVA BERNARDI", "MIGUEL SANTIAGO ALVARENGA", "NICOLAS SCARPELINI DE ALBUQUERQUE", "PEDRO AMARAL GULARTE SANTA CRUZ", "PEDRO AMARAL RIBEIRO", "SANTIAGO MIGUEL GONZALES ROSAS", "SOPHIA GALHARDO DAUDT", "VICTOR GABRIEL CARVALHO CIRIMPEI", "VINICIUS ASSIS MENDONÇA"]}, {"nome_modalidade": "BASQUETE", "turma": "BASQUETE-3ª5ª", "monitor": "", "dias": ["ter", "qui"], "horario": "16h200", "alunos": ["CARLOS EDUARDO SILVA MATOS", "CARLOS WESLEY DA MOTA BASTOS II", "CAUÊ CÂNDIDO DA SILVA TAVARES", "JOAO VICTOR SILVA MATOS", "JOÃO PEDRO CAVALCANTE REGO CARVALHO", "LUCAS ARAUJO LEITE"]}, {"nome_modalidade": "RÍTMOS", "turma": "RÍTMOS-2ª4ª", "monitor": "", "dias": ["seg", "qua"], "horario": "19h20", "alunos": ["CARMEL DE FREITAS MARQUES", "ELOISA NÓRA PIRES", "GABRIELA TEIXEIRA BISCONSIN", "LARA DE OLIVEIRA RIBEIRO ALELUIA", "LAURA DAMASCENO SPINOLA", "LAURA RIBEIRO FERREIRA BORGES", "MANUELA NUNES PRADO MAMEDE", "MARIANA DA COSTA RAPOSO", "NICOLE COELHO BIANCHI", "SOFIA QUEZADO VALLS"]}, {"nome_modalidade": "VOLEIBOL TREINAMENTO SUB17", "turma": "VOLEIBOL_TREINAMENTO_SUB17-2ª4ª5ª", "monitor": "", "dias": ["seg", "qua", "qui"], "horario": "17h20", "alunos": ["CECILIA PERRINI", "CECÍLIA BASSUL EVANGELISTA GONÇALVES", "ISABELA SATO DE PAULA SANTOS", "ISADORA BASSUL EVANGELISTA GONÇALVES", "JULIA CARNEIRO RIBEIRO", "LAURA GAIGHER CASEIRO", "LEANDRA CARVALHO DE OLIVEIRA", "LUISA LIMA FERRAZ", "LÍVIA MELNYK MORELLI FACCHINI", "MAYANA BEATRIZ MACHADO GONÇALVES", "NICOLE MILEY OLIVEIRA COSTA", "ROBERTA TORRES DE VASCONCELLOS", "SABINA LEITE VELLOSO", "SOFIA DE ALEMAR BERNARDES", "SOPHIA MEI SUMI", "VITÓRIA DRUMOND FERNANDES GUIMARÃES"]}, {"nome_modalidade": "ESTENDIDO GRUPO 04", "turma": "ESTENDIDO_GRUPO_04", "monitor": "", "dias": ["seg", "ter", "qua", "qui", "sex"], "horario": "manhã", "alunos": ["DAVI LIMA BRAGA", "RODRIGO IGNACIO GONZALES ROSAS", "SOFIA CHAVES MARTINS"]}, {"nome_modalidade": "ESTENDIDO GRUPO 03", "turma": "ESTENDIDO_GRUPO_03", "monitor": "", "dias": ["seg", "ter", "qua", "qui", "sex"], "horario": "manhã", "alunos": ["DOM OLIVEIRA DE PAULA MANSÃO", "GUSTAVO VIEIRA GARRIDO", "LARA GOES PASTORE", "THEO DE FARIAS FRANÇA"]}, {"nome_modalidade": "DANÇA URBANA 1", "turma": "DANÇA_URBANA_1-2ª4ª", "monitor": "", "dias": ["seg", "qua"], "horario": "18h30", "alunos": ["HEITOR OLIVEIRA SANTOS", "PEDRO HENRI SILVA RODRIGUES"]}, {"nome_modalidade": "JIU", "turma": "JIU-3ª5ª", "monitor": "", "dias": ["ter", "qui"], "horario": "12h40", "alunos": ["LUCAS ARAUJO LEITE", "MIGUEL FLEURI DE PAULA DOS SANTOS"]}]; // ex: "https://script.google.com/macros/s/SEU_ID/exec"
+// ============================================================
+
+const USERS_KEY = 'mger_users_v1';
+let currentUser = null;
+
+function getUsers() {
+  try {
+    const r = localStorage.getItem(USERS_KEY);
+    if (r) {
+      const parsed = JSON.parse(r);
+      if (Object.keys(parsed).length > 0) return parsed;
+    }
+  } catch(e) {}
+  // Fallback: demo user only if nothing stored yet
+  return { demo: { senha: 'demo123', temp: false, ativo: true, nome: 'Demo', turmas: [] } };
+}
+
+function saveUsers(users) {
+  try { localStorage.setItem(USERS_KEY, JSON.stringify(users)); } catch(e) {}
+}
+
+async function loadUsers() {
+  if (!SHEET_URL) return;
+  try {
+    const r = await fetch(SHEET_URL + '?action=getUsers&t=' + Date.now());
+    if (r.ok) {
+      const d = await r.json();
+      if (d && d.users && Object.keys(d.users).length > 0) {
+        saveUsers(d.users);
+      }
+    }
+  } catch(e) {}
+}
+
+function hashSimple(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return 'h' + Math.abs(hash).toString(36);
+}
+
+// --- SYNC ---
+function setSyncStatus(ok,msg){
+  document.getElementById('sync-dot').className='sync-dot '+(ok?'ok':'err');
+  document.getElementById('sync-text').textContent=msg;
+  document.getElementById('sync-badge').textContent=ok?'Online':'Offline';
+}
+
+async function syncToSheet(payload){
+  if(!SHEET_URL){setSyncStatus(false,'Sincronização não configurada');return false;}
+  try{
+    const r=await fetch(SHEET_URL,{method:'POST',body:JSON.stringify(payload)});
+    if(r.ok){setSyncStatus(true,'Salvo e sincronizado — '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));return true;}
+    setSyncStatus(false,'Erro ao sincronizar');return false;
+  }catch(e){setSyncStatus(false,'Sem conexão — salvo localmente');return false;}
+}
+
+
+// ============================================================
+// CARREGAR TURMAS E ALUNOS DO SHEETS (atualização dinâmica)
+// ============================================================
+async function loadTurmasFromSheet(){
+  if(!SHEET_URL) return;
+  try{
+    const r=await fetch(SHEET_URL+'?action=getAlunos&t='+Date.now());
+    if(!r.ok) return;
+    const text=await r.text();
+    const data=JSON.parse(text);
+    if(data&&data.alunos&&data.alunos.length>0){
+      // Convert alunos list into TURMAS structure
+      const turmasMap={};
+      data.alunos.forEach(a=>{
+        if(a.status==='Inativo') return;
+        const key=a.turma||'SEM_TURMA';
+        if(!turmasMap[key]){
+          turmasMap[key]={
+            nome_modalidade: a.modalidade||key,
+            turma: key,
+            monitor: '',
+            dias: a.dias||[],
+            horario: a.horario||'',
+            alunos: []
+          };
+        }
+        if(a.nome&&!turmasMap[key].alunos.includes(a.nome)){
+          turmasMap[key].alunos.push(a.nome);
+        }
+      });
+      const novasTurmas=Object.values(turmasMap).filter(t=>t.alunos.length>0);
+      if(novasTurmas.length>0){
+        // Sort alunos alphabetically
+        novasTurmas.forEach(t=>t.alunos.sort());
+        TURMAS=novasTurmas;
+        populateSelects();
+        // Re-render if turma already selected
+        if(typeof curTurma!=='undefined'&&curTurma){
+          const updated=TURMAS.find(t=>t.turma===curTurma.turma);
+          if(updated){curTurma=updated;renderDiario();}
+        }
+        console.log('Turmas atualizadas do servidor:',TURMAS.length);
+      }
+    }
+  }catch(e){
+    console.log('Usando turmas locais (fallback):',e.message);
+  }
+}
+// ============================================================
+
+async function loadFromSheet(){
+  if(!SHEET_URL){setSyncStatus(false,'Modo offline — configure SHEET_URL');return;}
+  setSyncStatus(false,'Conectando...');
+  try{
+    const r=await fetch(SHEET_URL+'?action=get&t='+Date.now());
+    if(r.ok){
+      const text=await r.text();
+      try{
+        const data=JSON.parse(text);
+        if(data&&typeof data==='object'&&!data.error){
+          Object.assign(ST,data);saveSt();
+          setSyncStatus(true,'Sincronizado — '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
+          if(curTurma)renderDiario();
+        }else{
+          setSyncStatus(false,'Erro na resposta do servidor');
+        }
+      }catch(je){setSyncStatus(false,'Resposta inválida do servidor');}
+    }else{
+      setSyncStatus(false,'Erro HTTP '+r.status);
+    }
+  }catch(e){
+    setSyncStatus(false,'Sem conexão — dados locais em uso');
+  }
+}
+
+// --- DATA ---
+function diasDoMes(ano,mes,dias){
+  // If dias is empty, default to all weekdays (Mon-Fri) for Estendido/Integral
+  const diasFinal=(dias&&dias.length)?dias:['seg','ter','qua','qui','sex'];
+  const r=[],d=new Date(ano,mes,1),m={0:'dom',1:'seg',2:'ter',3:'qua',4:'qui',5:'sex',6:'sab'};
+  while(d.getMonth()===mes){if(diasFinal.includes(m[d.getDay()]))r.push(new Date(d));d.setDate(d.getDate()+1);}return r;
+}
+function fmtDate(d){return d.toISOString().slice(0,10);}
+function fmtDM(d){return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');}
+function isToday(d){return fmtDate(d)===fmtDate(new Date());}
+function getKey(t,dt,a){return t+'|'+dt+'|'+a;}
+
+// --- SELECTS ---
+function populateSelects(){
+  const mods=[...new Set(TURMAS.map(t=>t.nome_modalidade))].sort();
+  const ms=document.getElementById('mod-sel');
+  ms.innerHTML='<option value="">Selecione a modalidade...</option>';
+  mods.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;ms.appendChild(o);});
+}
+populateSelects();
+
+function onMod(){
+  const m=ms.value,ts=document.getElementById('turma-sel');
+  ts.innerHTML='<option value="">Selecione a turma...</option>';
+  ['turma-header','diario-area'].forEach(id=>document.getElementById(id).innerHTML='');
+  document.getElementById('salvar-btn').style.display='none';
+  document.getElementById('mes-nav').style.display='none';
+  curTurma=null;
+  if(!m){ts.style.display='none';return;}
+  TURMAS.filter(t=>t.nome_modalidade===m).forEach(t=>{
+    const o=document.createElement('option');o.value=t.turma;
+    o.textContent=t.turma+(t.horario?' — '+t.horario:'');ts.appendChild(o);
+  });ts.style.display='block';
+}
+
+function onTurma(){
+  const tid=document.getElementById('turma-sel').value;
+  if(!tid){['turma-header','diario-area'].forEach(id=>document.getElementById(id).innerHTML='');document.getElementById('salvar-btn').style.display='none';document.getElementById('mes-nav').style.display='none';document.getElementById('alert-panel').classList.remove('visible');return;}
+  curTurma=TURMAS.find(t=>t.turma===tid);
+  viewMes=new Date();
+  document.getElementById('mes-nav').style.display='flex';
+  renderML();renderDiario();
+}
+
+function renderML(){document.getElementById('mes-label').textContent=MESES[viewMes.getMonth()].toUpperCase()+' '+viewMes.getFullYear();}
+function mudaMes(d){viewMes=new Date(viewMes.getFullYear(),viewMes.getMonth()+d,1);renderML();renderDiario();}
+
+function renderDiario(){
+  const t=curTurma;if(!t)return;
+  const ano=viewMes.getFullYear(),mes=viewMes.getMonth();
+  const aulas=diasDoMes(ano,mes,t.dias);
+  const diasStr=t.dias.map(d=>DIAS_NOME[d]).join(', ');
+  document.getElementById('turma-header').innerHTML=`
+    <div class="turma-header">
+      <div class="th-top">
+        <div class="th-nome">${t.nome_modalidade}${t.isUnificado?'':' — '+t.turma}</div>
+        <div class="th-meta">${diasStr} &nbsp;|&nbsp; ${t.horario} &nbsp;|&nbsp; ${t.monitor}</div>
+        ${t.isUnificado?'<span style="display:inline-block;background:#E31837;color:white;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;margin-top:5px;text-transform:uppercase">Turma Unificada</span>':''}
+      </div>
+      <div class="th-stats" id="th-stats"></div>
+    </div>`;
+  if(!aulas.length){document.getElementById('diario-area').innerHTML='<div class="sem-aula">Sem aulas neste mês para esta turma.</div>';document.getElementById('salvar-btn').style.display='none';return;}
+  const maxC=5,chunks=[];
+  for(let i=0;i<aulas.length;i+=maxC)chunks.push(aulas.slice(i,i+maxC));
+  let html='';let cellIndex=0;cellMap={};
+  chunks.forEach((chunk,ci)=>{
+    html+=`<div class="diario-wrap"><table class="diario-table"><thead><tr><th style="width:105px">Aluno</th>`;
+    chunk.forEach(d=>{
+      const tod=isToday(d)?'today-col':'';
+      const dw=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][d.getDay()];
+      html+=`<th class="${tod}">${dw}<br>${fmtDM(d)}</th>`;
+    });
+    html+=`</tr></thead><tbody>`;
+    if(t.isUnificado){
+      t.grupos.forEach((g)=>{
+        html+=`<tr class="divider-row"><td colspan="${chunk.length+1}">${g.label}</td></tr>`;
+        g.alunos.forEach((a,ai)=>{
+          html+=`<tr><td class="nome-cell"><span class="nome-num">${ai+1}.</span>${a.split(' ').slice(0,2).join(' ')}</td>`;
+          chunk.forEach(d=>{const dk=fmtDate(d),k=getKey(t.turma,dk,a),v=ST[k]||'N',tod=isToday(d)?'today-col':'';const idx=cellIndex++;html+=`<td class="dia-cell ${v} ${tod}" data-idx="${idx}" onclick="toggle(this)"><span class="dia-mark">${v==='P'?'P':v==='F'?'F':'-'}</span></td>`;cellMap[idx]={turma:t.turma,data:dk,aluno:a};});
+          html+=`</tr>`;
+        });
+      });
+    }else{
+      t.alunos.forEach((a,ai)=>{
+        html+=`<tr><td class="nome-cell"><span class="nome-num">${ai+1}.</span>${a.split(' ').slice(0,2).join(' ')}</td>`;
+        chunk.forEach(d=>{const dk=fmtDate(d),k=getKey(t.turma,dk,a),v=ST[k]||'N',tod=isToday(d)?'today-col':'';const idx=cellIndex++;html+=`<td class="dia-cell ${v} ${tod}" data-idx="${idx}" onclick="toggle(this)"><span class="dia-mark">${v==='P'?'P':v==='F'?'F':'-'}</span></td>`;cellMap[idx]={turma:t.turma,data:dk,aluno:a};});
+        html+=`</tr>`;
+      });
+    }
+    html+=`</tbody></table>`;
+    if(ci===chunks.length-1)html+=`<div class="legenda"><span><span class="leg-dot" style="background:#002B7F"></span>P — Presente</span><span><span class="leg-dot" style="background:#E31837"></span>F — Falta</span><span>Toque para alternar</span></div>`;
+    html+=`</div>`;
+  });
+  document.getElementById('diario-area').innerHTML=html;
+  document.getElementById('salvar-btn').style.display='block';
+  document.getElementById('alert-panel').classList.add('visible');
+  updateStats(t,aulas);
+}
+
+function toggle(cell){
+  const idx=parseInt(cell.getAttribute('data-idx'));
+  const info=cellMap[idx];
+  if(!info)return;
+  const k=getKey(info.turma,info.data,info.aluno);
+  const cur=ST[k]||'N';
+  const next=cur==='N'?'P':cur==='P'?'F':'N';
+  ST[k]=next;
+  const tod=cell.classList.contains('today-col');
+  cell.className='dia-cell '+next+(tod?' today-col':'');
+  const mark=cell.querySelector('.dia-mark');
+  if(mark)mark.textContent=next==='P'?'P':next==='F'?'F':'-';
+  const t=TURMAS.find(x=>x.turma===info.turma);
+  if(t)updateStats(t,diasDoMes(viewMes.getFullYear(),viewMes.getMonth(),t.dias));
+}
+function updateStats(t,aulas){
+  let p=0,f=0,n=0;
+  aulas.forEach(d=>{const dk=fmtDate(d);t.alunos.forEach(a=>{const v=ST[getKey(t.turma,dk,a)]||'N';if(v==='P')p++;else if(v==='F')f++;else n++;});});
+  const el=document.getElementById('th-stats');
+  if(el)el.innerHTML=`<div class="th-stat"><div class="th-stat-n p">${p}</div><div class="th-stat-l">Presenças</div></div><div class="th-stat"><div class="th-stat-n f">${f}</div><div class="th-stat-l">Faltas</div></div><div class="th-stat"><div class="th-stat-n">${n}</div><div class="th-stat-l">Não marcados</div></div>`;
+}
+
+
+// ============================================================
+// SINALIZAÇÕES
+// ============================================================
+const SIG_KEY = 'mprof_signals_v1';
+
+function loadSignals() {
+  try { return JSON.parse(localStorage.getItem(SIG_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveSignals(sigs) {
+  try { localStorage.setItem(SIG_KEY, JSON.stringify(sigs)); } catch(e) {}
+}
+
+function openSignal(tipo) {
+  const t = curTurma;
+  if (!t) return;
+  const box = document.getElementById('signal-modal');
+  const isVisitante = tipo === 'visitante';
+  const colorClass = isVisitante ? 'amber' : 'red';
+  const titulo = isVisitante ? 'Aluno visitante na turma' : 'Aluno faltando da lista';
+  const descPlaceholder = isVisitante
+    ? 'Nome do aluno visitante...'
+    : 'Nome do aluno que deveria estar na lista...';
+  const obs = isVisitante
+    ? 'Informe o nome do aluno que está presente mas não consta na lista da turma.'
+    : 'Informe o nome do aluno que está na lista mas não apareceu e você não conseguiu identificar o motivo.';
+
+  box.innerHTML = `
+    <div class="signal-modal-head ${colorClass}">
+      <h3>${titulo}</h3>
+      <button class="signal-modal-close" onclick="closeSignal()">×</button>
+    </div>
+    <div class="signal-modal-body">
+      <div style="font-size:11px;color:#5A6480;margin-bottom:12px;line-height:1.5">${obs}</div>
+      <label class="signal-label">Turma</label>
+      <div style="font-size:12px;font-weight:600;color:#002B7F;margin-bottom:12px;background:#E8EDF8;padding:8px 10px;border-radius:6px">${t.nome_modalidade} — ${t.turma}</div>
+      <label class="signal-label">Nome do aluno</label>
+      <input class="signal-input" id="sig-nome" placeholder="${descPlaceholder}" onkeydown="if(event.key==='Enter')submitSignal('${tipo}')">
+      <label class="signal-label">Observação (opcional)</label>
+      <input class="signal-input" id="sig-obs" placeholder="Ex: veio com outro professor, não soube informar..." onkeydown="if(event.key==='Enter')submitSignal('${tipo}')">
+      <button class="signal-submit ${colorClass}" onclick="submitSignal('${tipo}')">Enviar sinalização</button>
+    </div>`;
+  document.getElementById('signal-modal-bg').style.display = 'flex';
+  setTimeout(() => document.getElementById('sig-nome').focus(), 100);
+}
+
+function closeSignal(e) {
+  if (!e || e.target === document.getElementById('signal-modal-bg'))
+    document.getElementById('signal-modal-bg').style.display = 'none';
+}
+
+async function submitSignal(tipo) {
+  const nome = (document.getElementById('sig-nome').value || '').trim();
+  const obs  = (document.getElementById('sig-obs').value || '').trim();
+  if (!nome) { document.getElementById('sig-nome').focus(); return; }
+
+  const t = curTurma;
+  const sig = {
+    id: Date.now(),
+    tipo,
+    aluno: nome.toUpperCase(),
+    obs,
+    turma: t.turma,
+    modalidade: t.nome_modalidade,
+    horario: t.horario,
+    professor: 'professor',
+    data: fmtDate(new Date()),
+    hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    resolvido: false
+  };
+
+  const sigs = loadSignals();
+  sigs.push(sig);
+  saveSignals(sigs);
+
+  // Sync to sheet
+  await syncSignal(sig);
+
+  document.getElementById('signal-modal-bg').style.display = 'none';
+
+  // Show confirmation toast
+  const toast = document.getElementById('toast');
+  toast.textContent = '✓ Sinalização enviada para a coordenação';
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 3000);
+}
+
+async function syncSignal(sig) {
+  if (!SHEET_URL) return;
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'saveSignal', signal: sig })
+    });
+  } catch(e) {}
+}
+// ============================================================
+async function salvar(){
+  saveSt();
+  const t=curTurma;
+  if(!t)return;
+  // Build payload for sync
+  const ano=viewMes.getFullYear(),mes=viewMes.getMonth();
+  const aulas=diasDoMes(ano,mes,t.dias);
+  const payload={action:'save',turma:t.turma,modalidade:t.nome_modalidade,mes:MESES[mes],ano,horario:t.horario,monitor:t.monitor,registros:{}};
+  aulas.forEach(d=>{
+    const dk=fmtDate(d);
+    t.alunos.forEach(a=>{payload.registros[getKey(t.turma,dk,a)]=ST[getKey(t.turma,dk,a)]||'N';});
+  });
+  const ok=await syncToSheet(payload);
+  const toast=document.getElementById('toast');
+  toast.textContent=ok?'Salvo e sincronizado! '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Salvo localmente. Sincronizará quando houver conexão.';
+  toast.style.display='block';
+  setTimeout(()=>toast.style.display='none',3000);
+}
+
+// Carrega dados da nuvem ao abrir
+window.addEventListener('load',()=>{ loadFromSheet(); loadTurmasFromSheet(); });
+// Tenta re-sincronizar ao recuperar conexão
+window.addEventListener('online',()=>{loadFromSheet();loadTurmasFromSheet();});
+</script>
+</body>
+</html>
