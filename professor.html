@@ -520,6 +520,10 @@ async function salvar(){
 window.addEventListener('load',()=>{ loadFromSheet(); loadTurmasFromSheet(); });
 // Tenta re-sincronizar ao recuperar conexão
 window.addEventListener('online',()=>{loadFromSheet();loadTurmasFromSheet();});
+// Recarrega turmas quando volta para a aba (professor pode ter ficado na tela)
+window.addEventListener('focus',()=>loadTurmasFromSheet());
+// Recarrega turmas a cada 5 minutos
+setInterval(()=>loadTurmasFromSheet(), 5*60*1000);
 </script>
 </body>
 </html>
