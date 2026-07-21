@@ -273,23 +273,30 @@ function renderLista(){
   const list=ALUNOS.filter(a=>(!q||a.nome.toLowerCase().includes(q))&&(!st||a.status===st)&&(!md||a.modalidade===md));
   const el=document.getElementById('lista-alunos');
   if(!list.length){el.innerHTML='<div class="empty">Nenhum aluno encontrado.</div>';return;}
-  el.innerHTML=list.map(a=>`
-    <div class="aluno-card">
-      <div class="aluno-avatar ${a.status==='Inativo'?'inativo':''}">${ini(a.nome)}</div>
+  el.innerHTML=list.map((a,i)=>{
+    const ativo=a.status!=='Inativo';
+    const badge=a.status==='Matriculado'?'badge-mat':a.status==='Pré-Matriculado'?'badge-pre':'badge-inat';
+    const badgeLabel=a.status==='Pré-Matriculado'?'Pré-Mat.':a.status;
+    return `<div class="aluno-card" data-idx="${i}">
+      <div class="aluno-avatar ${ativo?'':'inativo'}">${ini(a.nome)}</div>
       <div class="aluno-info">
         <div class="aluno-nome">${a.nome}</div>
-        <div class="aluno-meta">${a.serie||''}${a.serie&&a.modalidade?' · ':''}${a.modalidade||''}${a.turma?' · '+a.turma:''}</div>
+        <div class="aluno-meta">${[a.serie,a.modalidade,a.turma].filter(Boolean).join(' · ')}</div>
       </div>
-      <span class="aluno-badge ${a.status==='Matriculado'?'badge-mat':a.status==='Pré-Matriculado'?'badge-pre':'badge-inat'}">${a.status==='Pré-Matriculado'?'Pré-Mat.':a.status}</span>
+      <span class="aluno-badge ${badge}">${badgeLabel}</span>
       <div class="aluno-actions">
-        <button class="btn-sm primary" onclick="openModalByNome('edit','${a.nome.replace(/'/g,\"\\\'\")}')" >Editar</button>
-        <button class="btn-sm" onclick="openModalByNome('move','${a.nome.replace(/'/g,\"\\\'\")}')" >Mover</button>
-        ${a.status!=='Inativo'
-          ?`<button class="btn-sm danger" onclick="openModalByNome('deactivate','${a.nome.replace(/'/g,\"\\\'\")}')" >Saída</button>`
-          :`<button class="btn-sm success" onclick="reativarByNome('${a.nome.replace(/'/g,\"\\\'\")}')" >Reativar</button>`}
+        <button class="btn-sm primary" onclick="openModalByIdx('edit',${i})">Editar</button>
+        <button class="btn-sm" onclick="openModalByIdx('move',${i})">Mover</button>
+        ${ativo
+          ?`<button class="btn-sm danger" onclick="openModalByIdx('deactivate',${i})">Saída</button>`
+          :`<button class="btn-sm success" onclick="reativarByIdx(${i})">Reativar</button>`}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+  // Store filtered list for index lookup
+  window._listaAtual=list;
 }
+
 function renderTurmas(){
   const md=document.getElementById('f-turma-mod').value;
   const tf=TURMAS_DATA.filter(t=>!md||t.modalidade===md);
@@ -304,19 +311,22 @@ function renderTurmas(){
         <button class="btn-sm" style="color:white;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.1)" onclick="openModal('add',null,'${t.turma}')">+ Aluno</button>
       </div>
       <div class="turma-body">
-        ${alivos.length?alivos.map(a=>`
-          <div class="aluno-card" style="border-radius:0;border-left:none;border-right:none;border-top:none;border-bottom:1px solid var(--border);margin:0">
+        ${alivos.length?alivos.map(a=>{
+          const ai=ALUNOS.indexOf(a);
+          return`<div class="aluno-card" style="border-radius:0;border-left:none;border-right:none;border-top:none;border-bottom:1px solid var(--border);margin:0">
             <div class="aluno-avatar">${ini(a.nome)}</div>
             <div class="aluno-info"><div class="aluno-nome">${a.nome}</div><div class="aluno-meta">${a.serie||''} · ${a.status}</div></div>
             <div class="aluno-actions">
-              <button class="btn-sm primary" onclick="openModalByNome('edit','${a.nome.replace(/'/g,\"\\\'\")}')" >Editar</button>
-              <button class="btn-sm" onclick="openModalByNome('move','${a.nome.replace(/'/g,\"\\\'\")}')" >Mover</button>
-              <button class="btn-sm danger" onclick="openModalByNome('deactivate','${a.nome.replace(/'/g,\"\\\'\")}')" >Saída</button>
+              <button class="btn-sm primary" onclick="openModal('edit',${a.id})">Editar</button>
+              <button class="btn-sm" onclick="openModal('move',${a.id})">Mover</button>
+              <button class="btn-sm danger" onclick="openModal('deactivate',${a.id})">Saída</button>
             </div>
-          </div>`).join(''):'<div style="padding:12px 16px;font-size:11px;color:var(--muted)">Nenhum aluno ativo.</div>'}
+          </div>`;
+        }).join(''):'<div style="padding:12px 16px;font-size:11px;color:var(--muted)">Nenhum aluno ativo.</div>'}
       </div></div>`;
   }).join('');
 }
+
 function renderLog(){
   const tipo=document.getElementById('f-log-tipo').value;
   const list=[...LOG].reverse().filter(l=>!tipo||l.tipo===tipo);
@@ -330,6 +340,18 @@ function renderLog(){
       <div class="log-info"><div class="log-desc"><span style="font-weight:700">${labels[l.tipo]||l.tipo}</span> — ${l.aluno}</div><div class="log-meta">${l.desc}</div></div>
       <div class="log-when">${fmtDate(l.quando)}<br><span>${l.quem||'Coordenação'}</span></div>
     </div>`).join('');
+}
+
+function openModalByIdx(tipo, idx){
+  const list=window._listaAtual||ALUNOS;
+  const a=list[idx];
+  if(!a){alert('Aluno não encontrado.');return;}
+  openModal(tipo, a.id);
+}
+function reativarByIdx(idx){
+  const list=window._listaAtual||ALUNOS;
+  const a=list[idx];
+  if(a)reativar(a.id);
 }
 function openModalByNome(tipo,nome){
   const a=ALUNOS.find(x=>x.nome===nome);
