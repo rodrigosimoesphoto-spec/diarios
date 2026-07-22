@@ -434,10 +434,14 @@ function openSignal(tipo) {
     </div>
     <div class="signal-modal-body">
       <div style="font-size:11px;color:#5A6480;margin-bottom:12px;line-height:1.5">${obs}</div>
-      <label class="signal-label">Turma</label>
+      <label class="signal-label">Turma atual (onde está presente)</label>
       <div style="font-size:12px;font-weight:600;color:#002B7F;margin-bottom:12px;background:#E8EDF8;padding:8px 10px;border-radius:6px">${t.nome_modalidade} — ${t.turma}</div>
       <label class="signal-label">Nome do aluno</label>
-      <input class="signal-input" id="sig-nome" placeholder="${descPlaceholder}" onkeydown="if(event.key==='Enter')submitSignal('${tipo}')">
+      <input class="signal-input" id="sig-nome" placeholder="${descPlaceholder}">
+      ${isVisitante ? `
+      <label class="signal-label">Turma correta do aluno (se souber)</label>
+      <input class="signal-input" id="sig-turma-correta" placeholder="Ex: FUTSAL-2ª4ª, Teatro turma da tarde...">
+      ` : ''}
       <label class="signal-label">Observação (opcional)</label>
       <input class="signal-input" id="sig-obs" placeholder="Ex: veio com outro professor, não soube informar..." onkeydown="if(event.key==='Enter')submitSignal('${tipo}')">
       <button class="signal-submit ${colorClass}" onclick="submitSignal('${tipo}')">Enviar sinalização</button>
@@ -454,6 +458,8 @@ function closeSignal(e) {
 async function submitSignal(tipo) {
   const nome = (document.getElementById('sig-nome').value || '').trim();
   const obs  = (document.getElementById('sig-obs').value || '').trim();
+  const turmaCorretaEl = document.getElementById('sig-turma-correta');
+  const turmaCorreta = turmaCorretaEl ? turmaCorretaEl.value.trim() : '';
   if (!nome) { document.getElementById('sig-nome').focus(); return; }
 
   const t = curTurma;
@@ -462,6 +468,7 @@ async function submitSignal(tipo) {
     tipo,
     aluno: nome.toUpperCase(),
     obs,
+    turmaCorreta: turmaCorreta || '',
     turma: t.turma,
     modalidade: t.nome_modalidade,
     horario: t.horario,
