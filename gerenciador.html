@@ -227,7 +227,20 @@ async function loadFromSheet(){
     const r=await fetch(SHEET_URL+'?action=getAlunos&t='+Date.now());
     if(r.ok){
       const d=await r.json();
-      if(d&&d.alunos&&d.alunos.length>0){ALUNOS=d.alunos;if(d.log)LOG=d.log;nextId=Math.max(...ALUNOS.map(a=>a.id),0)+1;saveLocal();renderAll();}
+      if(d&&d.alunos&&d.alunos.length>0){
+        // Validate: only use Sheets data if turma keys match current TURMAS_DATA
+        const turmasKeys=new Set(TURMAS_DATA.map(t=>t.turma));
+        const alunosValidos=d.alunos.filter(a=>!a.turma||a.status==='Inativo'||turmasKeys.has(a.turma));
+        const matchRate=alunosValidos.filter(a=>a.status!=='Inativo').length/Math.max(d.alunos.filter(a=>a.status!=='Inativo').length,1);
+        if(matchRate>0.5){
+          // More than 50% of active alunos match current turmas - use Sheets data
+          ALUNOS=d.alunos;if(d.log)LOG=d.log;nextId=Math.max(...ALUNOS.map(a=>a.id),0)+1;saveLocal();renderAll();
+        }else{
+          // Sheets data has old turma keys - push current embedded data to Sheets
+          console.log('Sheets data has old turma keys ('+Math.round(matchRate*100)+'% match). Pushing current data to Sheets.');
+          syncToSheet();
+        }
+      }
       setSyncStatus(true,false,'Dados carregados — '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
     }else setSyncStatus(false,false,'Erro ao carregar');
   }catch(e){setSyncStatus(false,true,'Offline — usando dados locais');}
