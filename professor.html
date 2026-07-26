@@ -223,8 +223,11 @@ async function loadFromSheet(){
           Object.assign(ST,data);saveSt();
           setSyncStatus(true,'Sincronizado — '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
           if(curTurma)renderDiario();
+        }else if(data&&data.error){
+          setSyncStatus(false,'Erro do servidor: '+data.error);
         }else{
-          setSyncStatus(false,'Erro na resposta do servidor');
+          // Empty object is fine - no data yet
+          setSyncStatus(true,'Sincronizado — '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
         }
       }catch(je){setSyncStatus(false,'Resposta inválida do servidor');}
     }else{
